@@ -1,0 +1,32 @@
+development:
+  clients:
+    default:
+      database: zerohcom_development
+      hosts:
+        - <%= ENV.fetch('MONGO_HOST', 'localhost') %>:<%= ENV.fetch('MONGO_PORT', 27027) %>
+      options:
+        user: <%= ENV.fetch('MONGO_USERNAME', 'zerohcom') %>
+        password: <%= ENV.fetch('MONGO_PASSWORD', 'zerohcom_dev') %>
+        auth_source: admin
+        server_selection_timeout: 5
+
+test:
+  clients:
+    default:
+      database: zerohcom_test
+      hosts:
+        - <%= ENV.fetch('MONGO_HOST', 'localhost') %>:<%= ENV.fetch('MONGO_PORT', 27027) %>
+      options:
+        user: <%= ENV.fetch('MONGO_USERNAME', 'zerohcom') %>
+        password: <%= ENV.fetch('MONGO_PASSWORD', 'zerohcom_dev') %>
+        auth_source: admin
+        read:
+          mode: :primary
+        server_selection_timeout: 5
+
+production:
+  clients:
+    default:
+      uri: <%= ENV.fetch('MONGO_URI', nil) %>
+      options:
+        server_selection_timeout: 5

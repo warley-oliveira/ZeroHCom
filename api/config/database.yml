@@ -1,0 +1,24 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  host: <%= ENV.fetch("PG_HOST", "localhost") %>
+  port: <%= ENV.fetch("PG_PORT", 25432) %>
+  username: <%= ENV.fetch("PG_USERNAME", "zerohcom") %>
+  password: <%= ENV.fetch("PG_PASSWORD", "zerohcom_dev") %>
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+
+development:
+  <<: *default
+  database: zerohcom_development
+
+test:
+  <<: *default
+  database: zerohcom_test
+
+production:
+  <<: *default
+  host: <%= ENV.fetch("PG_HOST") %>
+  port: <%= ENV.fetch("PG_PORT", 5432) %>
+  username: <%= ENV.fetch("PG_USERNAME") %>
+  password: <%= ENV.fetch("PG_PASSWORD") %>
+  database: <%= ENV.fetch("PG_DATABASE", "zerohcom_production") %>
