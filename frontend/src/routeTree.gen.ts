@@ -14,13 +14,18 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as LoginImport } from './routes/login'
 import { Route as AuthedImport } from './routes/_authed'
 import { Route as IndexImport } from './routes/index'
-import { Route as AuthedRelatoriosImport } from './routes/_authed/relatorios'
-import { Route as AuthedProdutosImport } from './routes/_authed/produtos'
-import { Route as AuthedPedidosImport } from './routes/_authed/pedidos'
+import { Route as PortalTokenImport } from './routes/portal.$token'
+import { Route as AuthedSettingsImport } from './routes/_authed/settings'
+import { Route as AuthedReportsImport } from './routes/_authed/reports'
+import { Route as AuthedProductsImport } from './routes/_authed/products'
+import { Route as AuthedOrdersImport } from './routes/_authed/orders'
+import { Route as AuthedLedgerImport } from './routes/_authed/ledger'
 import { Route as AuthedInvoicesImport } from './routes/_authed/invoices'
+import { Route as AuthedExpensesImport } from './routes/_authed/expenses'
 import { Route as AuthedDashboardImport } from './routes/_authed/dashboard'
-import { Route as AuthedConfiguracoesImport } from './routes/_authed/configuracoes'
-import { Route as AuthedClientesImport } from './routes/_authed/clientes'
+import { Route as AuthedCustomersImport } from './routes/_authed/customers'
+import { Route as AuthedAssetsImport } from './routes/_authed/assets'
+import { Route as AuthedAgreementsImport } from './routes/_authed/agreements'
 
 // Create/Update Routes
 
@@ -41,21 +46,39 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const AuthedRelatoriosRoute = AuthedRelatoriosImport.update({
-  id: '/relatorios',
-  path: '/relatorios',
+const PortalTokenRoute = PortalTokenImport.update({
+  id: '/portal/$token',
+  path: '/portal/$token',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AuthedSettingsRoute = AuthedSettingsImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => AuthedRoute,
 } as any)
 
-const AuthedProdutosRoute = AuthedProdutosImport.update({
-  id: '/produtos',
-  path: '/produtos',
+const AuthedReportsRoute = AuthedReportsImport.update({
+  id: '/reports',
+  path: '/reports',
   getParentRoute: () => AuthedRoute,
 } as any)
 
-const AuthedPedidosRoute = AuthedPedidosImport.update({
-  id: '/pedidos',
-  path: '/pedidos',
+const AuthedProductsRoute = AuthedProductsImport.update({
+  id: '/products',
+  path: '/products',
+  getParentRoute: () => AuthedRoute,
+} as any)
+
+const AuthedOrdersRoute = AuthedOrdersImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => AuthedRoute,
+} as any)
+
+const AuthedLedgerRoute = AuthedLedgerImport.update({
+  id: '/ledger',
+  path: '/ledger',
   getParentRoute: () => AuthedRoute,
 } as any)
 
@@ -65,21 +88,33 @@ const AuthedInvoicesRoute = AuthedInvoicesImport.update({
   getParentRoute: () => AuthedRoute,
 } as any)
 
+const AuthedExpensesRoute = AuthedExpensesImport.update({
+  id: '/expenses',
+  path: '/expenses',
+  getParentRoute: () => AuthedRoute,
+} as any)
+
 const AuthedDashboardRoute = AuthedDashboardImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => AuthedRoute,
 } as any)
 
-const AuthedConfiguracoesRoute = AuthedConfiguracoesImport.update({
-  id: '/configuracoes',
-  path: '/configuracoes',
+const AuthedCustomersRoute = AuthedCustomersImport.update({
+  id: '/customers',
+  path: '/customers',
   getParentRoute: () => AuthedRoute,
 } as any)
 
-const AuthedClientesRoute = AuthedClientesImport.update({
-  id: '/clientes',
-  path: '/clientes',
+const AuthedAssetsRoute = AuthedAssetsImport.update({
+  id: '/assets',
+  path: '/assets',
+  getParentRoute: () => AuthedRoute,
+} as any)
+
+const AuthedAgreementsRoute = AuthedAgreementsImport.update({
+  id: '/agreements',
+  path: '/agreements',
   getParentRoute: () => AuthedRoute,
 } as any)
 
@@ -108,18 +143,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginImport
       parentRoute: typeof rootRoute
     }
-    '/_authed/clientes': {
-      id: '/_authed/clientes'
-      path: '/clientes'
-      fullPath: '/clientes'
-      preLoaderRoute: typeof AuthedClientesImport
+    '/_authed/agreements': {
+      id: '/_authed/agreements'
+      path: '/agreements'
+      fullPath: '/agreements'
+      preLoaderRoute: typeof AuthedAgreementsImport
       parentRoute: typeof AuthedImport
     }
-    '/_authed/configuracoes': {
-      id: '/_authed/configuracoes'
-      path: '/configuracoes'
-      fullPath: '/configuracoes'
-      preLoaderRoute: typeof AuthedConfiguracoesImport
+    '/_authed/assets': {
+      id: '/_authed/assets'
+      path: '/assets'
+      fullPath: '/assets'
+      preLoaderRoute: typeof AuthedAssetsImport
+      parentRoute: typeof AuthedImport
+    }
+    '/_authed/customers': {
+      id: '/_authed/customers'
+      path: '/customers'
+      fullPath: '/customers'
+      preLoaderRoute: typeof AuthedCustomersImport
       parentRoute: typeof AuthedImport
     }
     '/_authed/dashboard': {
@@ -129,6 +171,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedDashboardImport
       parentRoute: typeof AuthedImport
     }
+    '/_authed/expenses': {
+      id: '/_authed/expenses'
+      path: '/expenses'
+      fullPath: '/expenses'
+      preLoaderRoute: typeof AuthedExpensesImport
+      parentRoute: typeof AuthedImport
+    }
     '/_authed/invoices': {
       id: '/_authed/invoices'
       path: '/invoices'
@@ -136,26 +185,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedInvoicesImport
       parentRoute: typeof AuthedImport
     }
-    '/_authed/pedidos': {
-      id: '/_authed/pedidos'
-      path: '/pedidos'
-      fullPath: '/pedidos'
-      preLoaderRoute: typeof AuthedPedidosImport
+    '/_authed/ledger': {
+      id: '/_authed/ledger'
+      path: '/ledger'
+      fullPath: '/ledger'
+      preLoaderRoute: typeof AuthedLedgerImport
       parentRoute: typeof AuthedImport
     }
-    '/_authed/produtos': {
-      id: '/_authed/produtos'
-      path: '/produtos'
-      fullPath: '/produtos'
-      preLoaderRoute: typeof AuthedProdutosImport
+    '/_authed/orders': {
+      id: '/_authed/orders'
+      path: '/orders'
+      fullPath: '/orders'
+      preLoaderRoute: typeof AuthedOrdersImport
       parentRoute: typeof AuthedImport
     }
-    '/_authed/relatorios': {
-      id: '/_authed/relatorios'
-      path: '/relatorios'
-      fullPath: '/relatorios'
-      preLoaderRoute: typeof AuthedRelatoriosImport
+    '/_authed/products': {
+      id: '/_authed/products'
+      path: '/products'
+      fullPath: '/products'
+      preLoaderRoute: typeof AuthedProductsImport
       parentRoute: typeof AuthedImport
+    }
+    '/_authed/reports': {
+      id: '/_authed/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof AuthedReportsImport
+      parentRoute: typeof AuthedImport
+    }
+    '/_authed/settings': {
+      id: '/_authed/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthedSettingsImport
+      parentRoute: typeof AuthedImport
+    }
+    '/portal/$token': {
+      id: '/portal/$token'
+      path: '/portal/$token'
+      fullPath: '/portal/$token'
+      preLoaderRoute: typeof PortalTokenImport
+      parentRoute: typeof rootRoute
     }
   }
 }
@@ -163,23 +233,31 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 interface AuthedRouteChildren {
-  AuthedClientesRoute: typeof AuthedClientesRoute
-  AuthedConfiguracoesRoute: typeof AuthedConfiguracoesRoute
+  AuthedAgreementsRoute: typeof AuthedAgreementsRoute
+  AuthedAssetsRoute: typeof AuthedAssetsRoute
+  AuthedCustomersRoute: typeof AuthedCustomersRoute
   AuthedDashboardRoute: typeof AuthedDashboardRoute
+  AuthedExpensesRoute: typeof AuthedExpensesRoute
   AuthedInvoicesRoute: typeof AuthedInvoicesRoute
-  AuthedPedidosRoute: typeof AuthedPedidosRoute
-  AuthedProdutosRoute: typeof AuthedProdutosRoute
-  AuthedRelatoriosRoute: typeof AuthedRelatoriosRoute
+  AuthedLedgerRoute: typeof AuthedLedgerRoute
+  AuthedOrdersRoute: typeof AuthedOrdersRoute
+  AuthedProductsRoute: typeof AuthedProductsRoute
+  AuthedReportsRoute: typeof AuthedReportsRoute
+  AuthedSettingsRoute: typeof AuthedSettingsRoute
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
-  AuthedClientesRoute: AuthedClientesRoute,
-  AuthedConfiguracoesRoute: AuthedConfiguracoesRoute,
+  AuthedAgreementsRoute: AuthedAgreementsRoute,
+  AuthedAssetsRoute: AuthedAssetsRoute,
+  AuthedCustomersRoute: AuthedCustomersRoute,
   AuthedDashboardRoute: AuthedDashboardRoute,
+  AuthedExpensesRoute: AuthedExpensesRoute,
   AuthedInvoicesRoute: AuthedInvoicesRoute,
-  AuthedPedidosRoute: AuthedPedidosRoute,
-  AuthedProdutosRoute: AuthedProdutosRoute,
-  AuthedRelatoriosRoute: AuthedRelatoriosRoute,
+  AuthedLedgerRoute: AuthedLedgerRoute,
+  AuthedOrdersRoute: AuthedOrdersRoute,
+  AuthedProductsRoute: AuthedProductsRoute,
+  AuthedReportsRoute: AuthedReportsRoute,
+  AuthedSettingsRoute: AuthedSettingsRoute,
 }
 
 const AuthedRouteWithChildren =
@@ -189,26 +267,36 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '': typeof AuthedRouteWithChildren
   '/login': typeof LoginRoute
-  '/clientes': typeof AuthedClientesRoute
-  '/configuracoes': typeof AuthedConfiguracoesRoute
+  '/agreements': typeof AuthedAgreementsRoute
+  '/assets': typeof AuthedAssetsRoute
+  '/customers': typeof AuthedCustomersRoute
   '/dashboard': typeof AuthedDashboardRoute
+  '/expenses': typeof AuthedExpensesRoute
   '/invoices': typeof AuthedInvoicesRoute
-  '/pedidos': typeof AuthedPedidosRoute
-  '/produtos': typeof AuthedProdutosRoute
-  '/relatorios': typeof AuthedRelatoriosRoute
+  '/ledger': typeof AuthedLedgerRoute
+  '/orders': typeof AuthedOrdersRoute
+  '/products': typeof AuthedProductsRoute
+  '/reports': typeof AuthedReportsRoute
+  '/settings': typeof AuthedSettingsRoute
+  '/portal/$token': typeof PortalTokenRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '': typeof AuthedRouteWithChildren
   '/login': typeof LoginRoute
-  '/clientes': typeof AuthedClientesRoute
-  '/configuracoes': typeof AuthedConfiguracoesRoute
+  '/agreements': typeof AuthedAgreementsRoute
+  '/assets': typeof AuthedAssetsRoute
+  '/customers': typeof AuthedCustomersRoute
   '/dashboard': typeof AuthedDashboardRoute
+  '/expenses': typeof AuthedExpensesRoute
   '/invoices': typeof AuthedInvoicesRoute
-  '/pedidos': typeof AuthedPedidosRoute
-  '/produtos': typeof AuthedProdutosRoute
-  '/relatorios': typeof AuthedRelatoriosRoute
+  '/ledger': typeof AuthedLedgerRoute
+  '/orders': typeof AuthedOrdersRoute
+  '/products': typeof AuthedProductsRoute
+  '/reports': typeof AuthedReportsRoute
+  '/settings': typeof AuthedSettingsRoute
+  '/portal/$token': typeof PortalTokenRoute
 }
 
 export interface FileRoutesById {
@@ -216,13 +304,18 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authed': typeof AuthedRouteWithChildren
   '/login': typeof LoginRoute
-  '/_authed/clientes': typeof AuthedClientesRoute
-  '/_authed/configuracoes': typeof AuthedConfiguracoesRoute
+  '/_authed/agreements': typeof AuthedAgreementsRoute
+  '/_authed/assets': typeof AuthedAssetsRoute
+  '/_authed/customers': typeof AuthedCustomersRoute
   '/_authed/dashboard': typeof AuthedDashboardRoute
+  '/_authed/expenses': typeof AuthedExpensesRoute
   '/_authed/invoices': typeof AuthedInvoicesRoute
-  '/_authed/pedidos': typeof AuthedPedidosRoute
-  '/_authed/produtos': typeof AuthedProdutosRoute
-  '/_authed/relatorios': typeof AuthedRelatoriosRoute
+  '/_authed/ledger': typeof AuthedLedgerRoute
+  '/_authed/orders': typeof AuthedOrdersRoute
+  '/_authed/products': typeof AuthedProductsRoute
+  '/_authed/reports': typeof AuthedReportsRoute
+  '/_authed/settings': typeof AuthedSettingsRoute
+  '/portal/$token': typeof PortalTokenRoute
 }
 
 export interface FileRouteTypes {
@@ -231,37 +324,52 @@ export interface FileRouteTypes {
     | '/'
     | ''
     | '/login'
-    | '/clientes'
-    | '/configuracoes'
+    | '/agreements'
+    | '/assets'
+    | '/customers'
     | '/dashboard'
+    | '/expenses'
     | '/invoices'
-    | '/pedidos'
-    | '/produtos'
-    | '/relatorios'
+    | '/ledger'
+    | '/orders'
+    | '/products'
+    | '/reports'
+    | '/settings'
+    | '/portal/$token'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | ''
     | '/login'
-    | '/clientes'
-    | '/configuracoes'
+    | '/agreements'
+    | '/assets'
+    | '/customers'
     | '/dashboard'
+    | '/expenses'
     | '/invoices'
-    | '/pedidos'
-    | '/produtos'
-    | '/relatorios'
+    | '/ledger'
+    | '/orders'
+    | '/products'
+    | '/reports'
+    | '/settings'
+    | '/portal/$token'
   id:
     | '__root__'
     | '/'
     | '/_authed'
     | '/login'
-    | '/_authed/clientes'
-    | '/_authed/configuracoes'
+    | '/_authed/agreements'
+    | '/_authed/assets'
+    | '/_authed/customers'
     | '/_authed/dashboard'
+    | '/_authed/expenses'
     | '/_authed/invoices'
-    | '/_authed/pedidos'
-    | '/_authed/produtos'
-    | '/_authed/relatorios'
+    | '/_authed/ledger'
+    | '/_authed/orders'
+    | '/_authed/products'
+    | '/_authed/reports'
+    | '/_authed/settings'
+    | '/portal/$token'
   fileRoutesById: FileRoutesById
 }
 
@@ -269,12 +377,14 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthedRoute: typeof AuthedRouteWithChildren
   LoginRoute: typeof LoginRoute
+  PortalTokenRoute: typeof PortalTokenRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthedRoute: AuthedRouteWithChildren,
   LoginRoute: LoginRoute,
+  PortalTokenRoute: PortalTokenRoute,
 }
 
 export const routeTree = rootRoute
@@ -289,7 +399,8 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/_authed",
-        "/login"
+        "/login",
+        "/portal/$token"
       ]
     },
     "/": {
@@ -298,45 +409,68 @@ export const routeTree = rootRoute
     "/_authed": {
       "filePath": "_authed.tsx",
       "children": [
-        "/_authed/clientes",
-        "/_authed/configuracoes",
+        "/_authed/agreements",
+        "/_authed/assets",
+        "/_authed/customers",
         "/_authed/dashboard",
+        "/_authed/expenses",
         "/_authed/invoices",
-        "/_authed/pedidos",
-        "/_authed/produtos",
-        "/_authed/relatorios"
+        "/_authed/ledger",
+        "/_authed/orders",
+        "/_authed/products",
+        "/_authed/reports",
+        "/_authed/settings"
       ]
     },
     "/login": {
       "filePath": "login.tsx"
     },
-    "/_authed/clientes": {
-      "filePath": "_authed/clientes.tsx",
+    "/_authed/agreements": {
+      "filePath": "_authed/agreements.tsx",
       "parent": "/_authed"
     },
-    "/_authed/configuracoes": {
-      "filePath": "_authed/configuracoes.tsx",
+    "/_authed/assets": {
+      "filePath": "_authed/assets.tsx",
+      "parent": "/_authed"
+    },
+    "/_authed/customers": {
+      "filePath": "_authed/customers.tsx",
       "parent": "/_authed"
     },
     "/_authed/dashboard": {
       "filePath": "_authed/dashboard.tsx",
       "parent": "/_authed"
     },
+    "/_authed/expenses": {
+      "filePath": "_authed/expenses.tsx",
+      "parent": "/_authed"
+    },
     "/_authed/invoices": {
       "filePath": "_authed/invoices.tsx",
       "parent": "/_authed"
     },
-    "/_authed/pedidos": {
-      "filePath": "_authed/pedidos.tsx",
+    "/_authed/ledger": {
+      "filePath": "_authed/ledger.tsx",
       "parent": "/_authed"
     },
-    "/_authed/produtos": {
-      "filePath": "_authed/produtos.tsx",
+    "/_authed/orders": {
+      "filePath": "_authed/orders.tsx",
       "parent": "/_authed"
     },
-    "/_authed/relatorios": {
-      "filePath": "_authed/relatorios.tsx",
+    "/_authed/products": {
+      "filePath": "_authed/products.tsx",
       "parent": "/_authed"
+    },
+    "/_authed/reports": {
+      "filePath": "_authed/reports.tsx",
+      "parent": "/_authed"
+    },
+    "/_authed/settings": {
+      "filePath": "_authed/settings.tsx",
+      "parent": "/_authed"
+    },
+    "/portal/$token": {
+      "filePath": "portal.$token.tsx"
     }
   }
 }

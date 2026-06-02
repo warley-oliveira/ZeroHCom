@@ -1,2 +1,3 @@
 api: cd api && bundle exec rails s -p 23000
 web: cd frontend && npm run dev
+worker: cd api && bundle exec sidekiq -C config/sidekiq.yml

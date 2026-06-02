@@ -1,6 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router"
+import { createFileRoute } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
 
-import { Button } from "@/components/ui/button"
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
@@ -8,67 +10,82 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useAuth } from "@/contexts/AuthContext"
+} from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { useAuth } from '@/contexts/AuthContext'
 
-export const Route = createFileRoute("/_authed/configuracoes")({
+export const Route = createFileRoute('/_authed/settings')({
   component: ConfiguracoesPage,
 })
 
 function ConfiguracoesPage() {
   const { user } = useAuth()
+  const { t } = useTranslation()
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-heading text-2xl font-semibold tracking-tight">
-          Configurações
+        <h1 className="flex items-center gap-2 font-heading text-2xl font-semibold tracking-tight">
+          {t('settings.title')}
+          <Badge
+            variant="outline"
+            className="border-amber-500/30 bg-amber-500/10 text-xs font-normal text-amber-500"
+          >
+            {t('settings.mockBadge')}
+          </Badge>
         </h1>
         <p className="text-sm text-muted-foreground">
-          Preferências da sua conta e da organização.
+          {t('settings.subtitle')}
         </p>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Perfil</CardTitle>
-            <CardDescription>Dados pessoais (mock).</CardDescription>
+            <CardTitle>{t('settings.profile.title')}</CardTitle>
+            <CardDescription>
+              {t('settings.profile.description')}
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="space-y-1.5">
-              <Label htmlFor="name">Nome</Label>
-              <Input id="name" defaultValue={user?.name ?? ""} />
+              <Label htmlFor="name">{t('settings.profile.fields.name')}</Label>
+              <Input id="name" defaultValue={user?.name ?? ''} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="email">E-mail</Label>
-              <Input id="email" type="email" defaultValue={user?.email ?? ""} />
+              <Label htmlFor="email">
+                {t('settings.profile.fields.email')}
+              </Label>
+              <Input id="email" type="email" defaultValue={user?.email ?? ''} />
             </div>
           </CardContent>
           <CardFooter className="justify-end">
-            <Button>Salvar</Button>
+            <Button>{t('common.save')}</Button>
           </CardFooter>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Organização</CardTitle>
-            <CardDescription>Identificação multi-tenant.</CardDescription>
+            <CardTitle>{t('settings.organization.title')}</CardTitle>
+            <CardDescription>
+              {t('settings.organization.description')}
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="space-y-1.5">
-              <Label htmlFor="org">ID da organização</Label>
+              <Label htmlFor="org">
+                {t('settings.organization.fields.id')}
+              </Label>
               <Input
                 id="org"
                 readOnly
-                value={user?.organization_id ?? ""}
+                value={user?.organization_id ?? ''}
                 className="font-mono"
               />
             </div>
             <p className="text-xs text-muted-foreground">
-              O ID é definido no provisionamento e não pode ser alterado pela UI.
+              {t('settings.organization.idHint')}
             </p>
           </CardContent>
         </Card>

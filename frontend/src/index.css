@@ -27,11 +27,20 @@
   --ring: oklch(0.708 0 0);
   --radius: 0.625rem;
 
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
+  /* Categorical chart palette (light). chart-1 = receita/green, chart-2 = despesa/red. */
+  --chart-1: oklch(0.62 0.17 152);
+  --chart-2: oklch(0.58 0.2 25);
+  --chart-3: oklch(0.6 0.16 250);
+  --chart-4: oklch(0.7 0.16 75);
+  --chart-5: oklch(0.58 0.18 300);
+
+  /* Semantic status tokens (light). */
+  --success: oklch(0.62 0.17 152);
+  --success-foreground: oklch(0.985 0 0);
+  --warning: oklch(0.7 0.16 75);
+  --warning-foreground: oklch(0.205 0 0);
+  --info: oklch(0.6 0.16 250);
+  --info-foreground: oklch(0.985 0 0);
 
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
@@ -67,11 +76,20 @@
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
 
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
+  /* Categorical chart palette (dark) — lifted L/chroma to read on the near-black card. */
+  --chart-1: oklch(0.7 0.17 152);
+  --chart-2: oklch(0.68 0.19 25);
+  --chart-3: oklch(0.68 0.15 250);
+  --chart-4: oklch(0.78 0.15 75);
+  --chart-5: oklch(0.68 0.17 300);
+
+  /* Semantic status tokens (dark). */
+  --success: oklch(0.7 0.17 152);
+  --success-foreground: oklch(0.205 0 0);
+  --warning: oklch(0.78 0.15 75);
+  --warning-foreground: oklch(0.205 0 0);
+  --info: oklch(0.68 0.15 250);
+  --info-foreground: oklch(0.205 0 0);
 
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
@@ -110,6 +128,13 @@
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
 
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -142,5 +167,40 @@
 
   body {
     @apply antialiased bg-background text-foreground;
+  }
+
+  /* Honor the OS "reduce motion" setting: neutralize entrance/count-up/chart animations. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* Printing a portal receipt: isolate the [data-receipt] block and force a
+     light, ink-friendly palette (the app renders dark by default). */
+  @media print {
+    body * {
+      visibility: hidden !important;
+    }
+
+    [data-receipt],
+    [data-receipt] * {
+      visibility: visible !important;
+    }
+
+    [data-receipt] {
+      position: fixed;
+      inset: 0;
+      margin: auto;
+      height: fit-content;
+      max-width: 24rem;
+      background: #ffffff !important;
+      color: #111111 !important;
+    }
   }
 }

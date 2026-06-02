@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 
 import { AuthProvider } from "@/contexts/AuthContext"
+import { ThemeProvider } from "@/contexts/ThemeContext"
 import { Toaster } from "@/components/ui/sonner"
 
 const queryClient = new QueryClient({
@@ -23,16 +24,18 @@ export const Route = createRootRoute({
 function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <Outlet />
-        <Toaster richColors position="top-right" />
-        {import.meta.env.DEV ? (
-          <>
-            <TanStackRouterDevtools position="bottom-right" />
-            <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
-          </>
-        ) : null}
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <Outlet />
+          <Toaster richColors position="top-right" />
+          {import.meta.env.DEV ? (
+            <>
+              <TanStackRouterDevtools position="bottom-right" />
+              <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
+            </>
+          ) : null}
+        </AuthProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   )
 }

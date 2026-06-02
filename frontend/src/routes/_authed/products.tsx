@@ -1,16 +1,18 @@
-import { createFileRoute } from "@tanstack/react-router"
-import { RiAddLine } from "@remixicon/react"
+import { createFileRoute } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
+import { RiAddLine } from '@remixicon/react'
 
-import { Button } from "@/components/ui/button"
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from '@/components/ui/card'
 
-export const Route = createFileRoute("/_authed/produtos")({
+export const Route = createFileRoute('/_authed/products')({
   component: ProdutosPage,
 })
 
@@ -22,33 +24,56 @@ type Produto = {
 }
 
 const MOCK_PRODUTOS: Produto[] = [
-  { sku: "ZHC-001", nome: "Plano Starter — anual", preco: 1188.0, estoque: 9999 },
-  { sku: "ZHC-002", nome: "Plano Pro — anual", preco: 3588.0, estoque: 9999 },
-  { sku: "ZHC-003", nome: "Add-on: Integração API", preco: 240.0, estoque: 150 },
-  { sku: "ZHC-004", nome: "Add-on: Onboarding assistido", preco: 980.0, estoque: 25 },
-  { sku: "ZHC-005", nome: "Add-on: SLA premium", preco: 540.0, estoque: 60 },
+  {
+    sku: 'ZHC-001',
+    nome: 'Plano Starter — anual',
+    preco: 1188.0,
+    estoque: 9999,
+  },
+  { sku: 'ZHC-002', nome: 'Plano Pro — anual', preco: 3588.0, estoque: 9999 },
+  {
+    sku: 'ZHC-003',
+    nome: 'Add-on: Integração API',
+    preco: 240.0,
+    estoque: 150,
+  },
+  {
+    sku: 'ZHC-004',
+    nome: 'Add-on: Onboarding assistido',
+    preco: 980.0,
+    estoque: 25,
+  },
+  { sku: 'ZHC-005', nome: 'Add-on: SLA premium', preco: 540.0, estoque: 60 },
 ]
 
-const currency = new Intl.NumberFormat("pt-BR", {
-  style: "currency",
-  currency: "BRL",
+const currency = new Intl.NumberFormat('pt-BR', {
+  style: 'currency',
+  currency: 'BRL',
 })
 
 function ProdutosPage() {
+  const { t } = useTranslation()
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="font-heading text-2xl font-semibold tracking-tight">
-            Produtos
+          <h1 className="flex items-center gap-2 font-heading text-2xl font-semibold tracking-tight">
+            {t('products.title')}
+            <Badge
+              variant="outline"
+              className="border-amber-500/30 bg-amber-500/10 text-xs font-normal text-amber-500"
+            >
+              {t('products.mockBadge')}
+            </Badge>
           </h1>
           <p className="text-sm text-muted-foreground">
-            Catálogo de planos e add-ons.
+            {t('products.subtitle')}
           </p>
         </div>
         <Button>
           <RiAddLine />
-          Novo produto
+          {t('products.new')}
         </Button>
       </div>
 
@@ -63,7 +88,9 @@ function ProdutosPage() {
                 </span>
               </div>
               <CardDescription>
-                Estoque: {p.estoque.toLocaleString("pt-BR")} unid.
+                {t('products.stock', {
+                  count: p.estoque.toLocaleString('pt-BR'),
+                })}
               </CardDescription>
             </CardHeader>
             <CardContent>

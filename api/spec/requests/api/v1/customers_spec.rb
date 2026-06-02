@@ -18,13 +18,36 @@ RSpec.describe 'Api::V1::Customers', type: :request do
       let!(:customer_a2) { create(:customer, organization: org_a, name: 'Beta Co') }
       let!(:customer_b)  { create(:customer, organization: org_b, name: 'Other Co') }
 
-      it 'returns only customers from the current tenant, ordered by name' do
+      it 'returns only tenant customers ordered by name, in a paginated envelope' do
         get '/api/v1/customers', headers: auth_headers(user_a)
 
         expect(response).to have_http_status(:ok)
         body = JSON.parse(response.body)
-        names = body.map { |c| c['name'] }
-        expect(names).to eq(['Acme', 'Beta Co'])
+        expect(body['data'].map { |c| c['name'] }).to eq([ 'Acme', 'Beta Co' ])
+        expect(body['meta']).to include('page' => 1, 'count' => 2, 'pages' => 1)
+        expect(body['meta']['per_page']).to eq(25)
+      end
+
+      it 'paginates with page/per_page and clamps per_page to the max' do
+        get '/api/v1/customers', params: { per_page: 1, page: 2 }, headers: auth_headers(user_a)
+
+        body = JSON.parse(response.body)
+        expect(body['data'].length).to eq(1)
+        expect(body['data'].first['name']).to eq('Beta Co')
+        expect(body['meta']).to include('page' => 2, 'per_page' => 1, 'count' => 2, 'pages' => 2)
+
+        get '/api/v1/customers', params: { per_page: 9_999 }, headers: auth_headers(user_a)
+        expect(JSON.parse(response.body)['meta']['per_page']).to eq(100)
+      end
+
+      it 'filters by the q term across name, email and external_id' do
+        get '/api/v1/customers', params: { q: 'Acme' }, headers: auth_headers(user_a)
+        expect(JSON.parse(response.body)['data'].map { |c| c['name'] }).to eq([ 'Acme' ])
+      end
+
+      it 'returns the full list (bypassing the page size) when all=true' do
+        get '/api/v1/customers', params: { all: 'true', per_page: 1 }, headers: auth_headers(user_a)
+        expect(JSON.parse(response.body)['data'].length).to eq(2)
       end
     end
   end
@@ -92,6 +115,33 @@ RSpec.describe 'Api::V1::Customers', type: :request do
             headers: auth_headers(user_a).merge('Content-Type' => 'application/json')
 
       expect(response).to have_http_status(:not_found)
+    end
+  end
+
+  describe 'POST /api/v1/customers/:id/regenerate_portal_token' do
+    let!(:customer_a) { create(:customer, organization: org_a) }
+    let!(:customer_b) { create(:customer, organization: org_b) }
+
+    it 'rotates the portal token and returns the customer' do
+      old_token = customer_a.portal_token
+
+      post "/api/v1/customers/#{customer_a.id}/regenerate_portal_token", headers: auth_headers(user_a)
+
+      expect(response).to have_http_status(:ok)
+      body = JSON.parse(response.body)
+      expect(body['portal_token']).to be_present
+      expect(body['portal_token']).not_to eq(old_token)
+      expect(customer_a.reload.portal_token).to eq(body['portal_token'])
+    end
+
+    it 'returns 404 for a customer in another tenant' do
+      post "/api/v1/customers/#{customer_b.id}/regenerate_portal_token", headers: auth_headers(user_a)
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it 'returns 401 when unauthenticated' do
+      post "/api/v1/customers/#{customer_a.id}/regenerate_portal_token"
+      expect(response).to have_http_status(:unauthorized)
     end
   end
 

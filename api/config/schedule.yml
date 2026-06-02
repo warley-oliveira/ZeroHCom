@@ -1,0 +1,6 @@
+# Recurring jobs loaded by sidekiq-cron on the Sidekiq worker process.
+billing_cycle:
+  cron: "0 6 * * *" # every day at 06:00
+  class: "BillingCycleJob"
+  queue: default
+  description: "Generate recurring invoices for all active agreements, per tenant"

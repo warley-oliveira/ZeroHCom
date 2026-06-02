@@ -21,6 +21,17 @@ gem "pundit", "~> 2.4"
 # Money handling (monetize, currency arithmetic)
 gem "money-rails", "~> 1.15"
 
+# Pagination (lightweight, dependency-free) — index endpoints
+gem "pagy", "~> 9.3"
+
+# Background jobs (ActiveJob adapter) + cron scheduling
+gem "sidekiq", "~> 7.3"
+gem "sidekiq-cron", "~> 2.0"
+# Pin connection_pool to 2.x: Sidekiq 7.x calls TimedStack#pop(timeout)
+# positionally, but connection_pool 3.0 dropped that arg, breaking the
+# scheduler ("wrong number of arguments (given 1, expected 0)").
+gem "connection_pool", "~> 2.5"
+
 # CORS
 gem "rack-cors", "~> 2.0"
 
@@ -46,6 +57,9 @@ group :development, :test do
 
   gem "rspec-rails", "~> 7.1"
   gem "factory_bot_rails", "~> 6.4"
+
+  # Realistic fake data for factories and dev seeds
+  gem "faker", "~> 3.4"
 
   # Audits gems for known security defects
   gem "bundler-audit", require: false

@@ -12,6 +12,21 @@ RSpec.describe Invoice, type: :model do
     expect(described_class.statuses.keys).to match_array(%w[draft open paid overdue cancelled])
   end
 
+  it 'defines the expected kind enum values' do
+    expect(described_class.kinds.keys).to match_array(%w[rent bond])
+  end
+
+  it 'defaults to the rent kind' do
+    expect(create(:invoice).kind).to eq('rent')
+  end
+
+  describe '#payment_reference' do
+    it 'derives a stable uppercase reference from the id' do
+      invoice = create(:invoice)
+      expect(invoice.payment_reference).to eq("INV-#{invoice.id.delete('-').first(8).upcase}")
+    end
+  end
+
   describe 'cross-tenant customer validation' do
     it 'is invalid when customer belongs to a different organization' do
       org_a = create(:organization)

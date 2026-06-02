@@ -2,10 +2,10 @@ const TOKEN_KEY = "zhc.token"
 const USER_KEY = "zhc.user"
 
 export type StoredUser = {
-  id: number
+  id: string
   email: string
   name: string
-  organization_id: number
+  organization_id: string
 }
 
 export const getToken = (): string | null => localStorage.getItem(TOKEN_KEY)

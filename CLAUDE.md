@@ -94,3 +94,13 @@ Não bloqueantes, mas vão pagar dividendos cedo:
 5. **Docker Compose para dev completo** (api + frontend + bancos) — opcional, mas útil para onboarding e para rodar e2e em CI sem instalar Ruby/Node.
 6. **Observabilidade unificada** (Sentry / OpenTelemetry) com o mesmo `release` ID nos dois lados, para correlacionar erro de frontend com request no backend.
 7. **CHANGELOG.md** raiz com decisões arquiteturais relevantes (ADRs leves) — futuro-você agradece.
+
+## graphify
+
+This project has a graphify knowledge graph at graphify-out/.
+
+Rules:
+- Before answering architecture or codebase questions, read graphify-out/GRAPH_REPORT.md for god nodes and community structure
+- If graphify-out/wiki/index.md exists, navigate it instead of reading raw files
+- For cross-module "how does X relate to Y" questions, prefer `graphify query "<question>"`, `graphify path "<A>" "<B>"`, or `graphify explain "<concept>"` over grep — these traverse the graph's EXTRACTED + INFERRED edges instead of scanning files
+- After modifying code files in this session, run `graphify update .` to keep the graph current (AST-only, no API cost)

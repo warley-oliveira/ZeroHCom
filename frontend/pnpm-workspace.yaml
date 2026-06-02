@@ -1,3 +1,10 @@
 allowBuilds:
   esbuild: false
   msw: false
+
+# Keep the TanStack Router toolchain on the 1.95.x line. router-plugin@1.95.0
+# imports `generator` from router-generator, an export that only exists up to
+# ~1.95.x; the `^1.95.0` range otherwise drifts to 1.167.x and breaks the build.
+# (Mirrors the npm-style `overrides` block in package.json, which pnpm ignores.)
+overrides:
+  "@tanstack/router-generator": "1.95.6"

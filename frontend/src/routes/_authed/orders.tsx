@@ -1,16 +1,18 @@
-import { createFileRoute } from "@tanstack/react-router"
-import { RiFilter3Line } from "@remixicon/react"
+import { createFileRoute } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
+import { RiFilter3Line } from '@remixicon/react'
 
-import { Button } from "@/components/ui/button"
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from '@/components/ui/card'
 
-export const Route = createFileRoute("/_authed/pedidos")({
+export const Route = createFileRoute('/_authed/orders')({
   component: PedidosPage,
 })
 
@@ -18,59 +20,105 @@ type Pedido = {
   id: string
   cliente: string
   valor: number
-  status: "pago" | "aguardando" | "cancelado"
+  status: 'pago' | 'aguardando' | 'cancelado'
   data: string
 }
 
 const MOCK_PEDIDOS: Pedido[] = [
-  { id: "PED-1042", cliente: "Ana Beatriz Costa", valor: 1289.9, status: "pago", data: "2026-05-27" },
-  { id: "PED-1041", cliente: "Bruno Almeida", valor: 540.0, status: "aguardando", data: "2026-05-27" },
-  { id: "PED-1040", cliente: "Eduarda Lima", valor: 3120.5, status: "pago", data: "2026-05-26" },
-  { id: "PED-1039", cliente: "Diego Ferreira", valor: 89.9, status: "cancelado", data: "2026-05-25" },
-  { id: "PED-1038", cliente: "Ana Beatriz Costa", valor: 760.0, status: "pago", data: "2026-05-25" },
-  { id: "PED-1037", cliente: "Carla Mendes", valor: 220.0, status: "aguardando", data: "2026-05-24" },
+  {
+    id: 'PED-1042',
+    cliente: 'Ana Beatriz Costa',
+    valor: 1289.9,
+    status: 'pago',
+    data: '2026-05-27',
+  },
+  {
+    id: 'PED-1041',
+    cliente: 'Bruno Almeida',
+    valor: 540.0,
+    status: 'aguardando',
+    data: '2026-05-27',
+  },
+  {
+    id: 'PED-1040',
+    cliente: 'Eduarda Lima',
+    valor: 3120.5,
+    status: 'pago',
+    data: '2026-05-26',
+  },
+  {
+    id: 'PED-1039',
+    cliente: 'Diego Ferreira',
+    valor: 89.9,
+    status: 'cancelado',
+    data: '2026-05-25',
+  },
+  {
+    id: 'PED-1038',
+    cliente: 'Ana Beatriz Costa',
+    valor: 760.0,
+    status: 'pago',
+    data: '2026-05-25',
+  },
+  {
+    id: 'PED-1037',
+    cliente: 'Carla Mendes',
+    valor: 220.0,
+    status: 'aguardando',
+    data: '2026-05-24',
+  },
 ]
 
-const STATUS_STYLES: Record<Pedido["status"], string> = {
-  pago: "bg-emerald-500/10 text-emerald-500 ring-emerald-500/20",
-  aguardando: "bg-amber-500/10 text-amber-500 ring-amber-500/20",
-  cancelado: "bg-destructive/10 text-destructive ring-destructive/20",
+const STATUS_STYLES: Record<Pedido['status'], string> = {
+  pago: 'bg-emerald-500/10 text-emerald-500 ring-emerald-500/20',
+  aguardando: 'bg-amber-500/10 text-amber-500 ring-amber-500/20',
+  cancelado: 'bg-destructive/10 text-destructive ring-destructive/20',
 }
 
-const currency = new Intl.NumberFormat("pt-BR", {
-  style: "currency",
-  currency: "BRL",
+const currency = new Intl.NumberFormat('pt-BR', {
+  style: 'currency',
+  currency: 'BRL',
 })
 
-const date = new Intl.DateTimeFormat("pt-BR", {
-  day: "2-digit",
-  month: "short",
+const date = new Intl.DateTimeFormat('pt-BR', {
+  day: '2-digit',
+  month: 'short',
 })
 
 function PedidosPage() {
+  const { t } = useTranslation()
   const total = MOCK_PEDIDOS.reduce((acc, p) => acc + p.valor, 0)
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="font-heading text-2xl font-semibold tracking-tight">
-            Pedidos
+          <h1 className="flex items-center gap-2 font-heading text-2xl font-semibold tracking-tight">
+            {t('orders.title')}
+            <Badge
+              variant="outline"
+              className="border-amber-500/30 bg-amber-500/10 text-xs font-normal text-amber-500"
+            >
+              {t('orders.mockBadge')}
+            </Badge>
           </h1>
           <p className="text-sm text-muted-foreground">
-            {MOCK_PEDIDOS.length} pedidos · total {currency.format(total)}
+            {t('orders.summary', {
+              count: MOCK_PEDIDOS.length,
+              total: currency.format(total),
+            })}
           </p>
         </div>
         <Button variant="outline">
           <RiFilter3Line />
-          Filtros
+          {t('orders.filters')}
         </Button>
       </div>
 
       <Card>
         <CardHeader className="border-b">
-          <CardTitle>Pedidos recentes</CardTitle>
-          <CardDescription>Últimos lançamentos (mock)</CardDescription>
+          <CardTitle>{t('orders.recent.title')}</CardTitle>
+          <CardDescription>{t('orders.recent.description')}</CardDescription>
         </CardHeader>
         <CardContent className="p-0">
           <div className="divide-y divide-border">
@@ -86,7 +134,7 @@ function PedidosPage() {
                 <span
                   className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${STATUS_STYLES[p.status]}`}
                 >
-                  {p.status}
+                  {t(`orders.status.${p.status}`)}
                 </span>
                 <div className="tabular-nums">{currency.format(p.valor)}</div>
                 <div className="text-right text-xs text-muted-foreground">

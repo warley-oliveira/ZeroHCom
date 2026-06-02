@@ -2,6 +2,7 @@ import { useEffect } from "react"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
+import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
@@ -22,43 +23,46 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { FormField } from "@/components/forms/FormField"
-import { useCustomers } from "@/hooks/useCustomers"
+import { useCustomerOptions } from "@/hooks/useCustomers"
 import { useCreateInvoice, useUpdateInvoice } from "@/hooks/useInvoices"
 import { toApiError } from "@/lib/api-errors"
 import type { Invoice, InvoiceStatus } from "@/types/invoice"
 
-const INVOICE_STATUSES: { value: InvoiceStatus; label: string }[] = [
-  { value: "draft", label: "Rascunho" },
-  { value: "open", label: "Em aberto" },
-  { value: "paid", label: "Paga" },
-  { value: "overdue", label: "Vencida" },
-  { value: "cancelled", label: "Cancelada" },
+const INVOICE_STATUSES: { value: InvoiceStatus; labelKey: string }[] = [
+  { value: "draft", labelKey: "invoices.statuses.draft" },
+  { value: "open", labelKey: "invoices.statuses.open" },
+  { value: "paid", labelKey: "invoices.statuses.paid" },
+  { value: "overdue", labelKey: "invoices.statuses.overdue" },
+  { value: "cancelled", labelKey: "invoices.statuses.cancelled" },
 ]
 
 const SUPPORTED_CURRENCIES = ["AUD", "BRL", "USD", "EUR", "GBP"] as const
 
-const invoiceSchema = z
-  .object({
-    customer_id: z.string().min(1, "Selecione um cliente"),
-    status: z.enum(["draft", "open", "paid", "overdue", "cancelled"], {
-      message: "Selecione um status",
-    }),
-    currency: z.enum(SUPPORTED_CURRENCIES, { message: "Selecione a moeda" }),
-    amount: z
-      .string()
-      .min(1, "Informe o valor")
-      .refine((v) => /^\d+([.,]\d{1,2})?$/.test(v), "Valor inválido")
-      .refine((v) => Number(v.replace(",", ".")) > 0, "Valor deve ser maior que zero"),
-    issue_date: z.string().min(1, "Informe a data de emissão"),
-    due_date: z.string().min(1, "Informe o vencimento"),
-    external_id: z.string().trim().optional(),
-  })
-  .refine((data) => data.due_date >= data.issue_date, {
-    message: "Vencimento deve ser igual ou posterior à emissão",
-    path: ["due_date"],
-  })
+type TranslateFn = (key: string) => string
 
-type InvoiceFormValues = z.infer<typeof invoiceSchema>
+const buildInvoiceSchema = (t: TranslateFn) =>
+  z
+    .object({
+      customer_id: z.string().min(1, t("invoices.form.errors.customerRequired")),
+      status: z.enum(["draft", "open", "paid", "overdue", "cancelled"], {
+        message: t("invoices.form.errors.statusRequired"),
+      }),
+      currency: z.enum(SUPPORTED_CURRENCIES, { message: t("invoices.form.errors.currencyRequired") }),
+      amount: z
+        .string()
+        .min(1, t("invoices.form.errors.amountRequired"))
+        .refine((v) => /^\d+([.,]\d{1,2})?$/.test(v), t("invoices.form.errors.amountInvalid"))
+        .refine((v) => Number(v.replace(",", ".")) > 0, t("invoices.form.errors.amountPositive")),
+      issue_date: z.string().min(1, t("invoices.form.errors.issueDateRequired")),
+      due_date: z.string().min(1, t("invoices.form.errors.dueDateRequired")),
+      external_id: z.string().trim().optional(),
+    })
+    .refine((data) => data.due_date >= data.issue_date, {
+      message: t("invoices.form.errors.dueDateAfterIssue"),
+      path: ["due_date"],
+    })
+
+type InvoiceFormValues = z.infer<ReturnType<typeof buildInvoiceSchema>>
 
 interface InvoiceFormDialogProps {
   open: boolean
@@ -82,13 +86,14 @@ function inputToCents(input: string): number {
 }
 
 export function InvoiceFormDialog({ open, onOpenChange, invoice }: InvoiceFormDialogProps) {
+  const { t } = useTranslation()
   const isEditing = Boolean(invoice)
-  const customersQuery = useCustomers()
+  const customersQuery = useCustomerOptions()
   const createMutation = useCreateInvoice()
   const updateMutation = useUpdateInvoice()
 
   const form = useForm<InvoiceFormValues>({
-    resolver: zodResolver(invoiceSchema),
+    resolver: zodResolver(buildInvoiceSchema(t)),
     defaultValues: {
       customer_id: "",
       status: "draft",
@@ -128,14 +133,14 @@ export function InvoiceFormDialog({ open, onOpenChange, invoice }: InvoiceFormDi
     try {
       if (invoice) {
         await updateMutation.mutateAsync({ id: invoice.id, payload })
-        toast.success("Fatura atualizada")
+        toast.success(t("invoices.toasts.updated"))
       } else {
         await createMutation.mutateAsync(payload)
-        toast.success("Fatura criada")
+        toast.success(t("invoices.toasts.created"))
       }
       onOpenChange(false)
     } catch (err) {
-      const apiError = toApiError(err, "Não foi possível salvar a fatura")
+      const apiError = toApiError(err, t("invoices.toasts.saveError"))
       if (apiError.fieldErrors) {
         Object.entries(apiError.fieldErrors).forEach(([field, messages]) => {
           // Map server-side `customer` errors to the `customer_id` field.
@@ -154,17 +159,17 @@ export function InvoiceFormDialog({ open, onOpenChange, invoice }: InvoiceFormDi
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>{isEditing ? "Editar fatura" : "Nova fatura"}</DialogTitle>
+          <DialogTitle>{isEditing ? t("invoices.form.editTitle") : t("invoices.form.createTitle")}</DialogTitle>
           <DialogDescription>
             {isEditing
-              ? "Atualize os dados da fatura."
-              : "Preencha os dados para emitir uma nova fatura."}
+              ? t("invoices.form.editDescription")
+              : t("invoices.form.createDescription")}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={onSubmit} className="space-y-4">
           <FormField
-            label="Cliente"
+            label={t("invoices.form.fields.customer")}
             required
             error={form.formState.errors.customer_id?.message}
           >
@@ -180,14 +185,16 @@ export function InvoiceFormDialog({ open, onOpenChange, invoice }: InvoiceFormDi
                   <SelectTrigger className="w-full">
                     <SelectValue
                       placeholder={
-                        customersQuery.isLoading ? "Carregando clientes…" : "Selecione o cliente"
+                        customersQuery.isLoading
+                          ? t("invoices.form.customerLoading")
+                          : t("invoices.form.customerPlaceholder")
                       }
                     />
                   </SelectTrigger>
                   <SelectContent>
                     {customers.length === 0 && !customersQuery.isLoading ? (
                       <div className="px-2 py-1.5 text-xs text-muted-foreground">
-                        Nenhum cliente cadastrado.
+                        {t("invoices.form.noCustomers")}
                       </div>
                     ) : (
                       customers.map((c) => (
@@ -204,7 +211,7 @@ export function InvoiceFormDialog({ open, onOpenChange, invoice }: InvoiceFormDi
 
           <div className="grid grid-cols-2 gap-4">
             <FormField
-              label="Moeda"
+              label={t("invoices.form.fields.currency")}
               required
               error={form.formState.errors.currency?.message}
             >
@@ -229,7 +236,7 @@ export function InvoiceFormDialog({ open, onOpenChange, invoice }: InvoiceFormDi
             </FormField>
 
             <FormField
-              label="Valor"
+              label={t("invoices.form.fields.amount")}
               htmlFor="invoice-amount"
               required
               error={form.formState.errors.amount?.message}
@@ -245,7 +252,7 @@ export function InvoiceFormDialog({ open, onOpenChange, invoice }: InvoiceFormDi
 
           <div className="grid grid-cols-2 gap-4">
             <FormField
-              label="Emissão"
+              label={t("invoices.form.fields.issueDate")}
               htmlFor="invoice-issue-date"
               required
               error={form.formState.errors.issue_date?.message}
@@ -258,7 +265,7 @@ export function InvoiceFormDialog({ open, onOpenChange, invoice }: InvoiceFormDi
             </FormField>
 
             <FormField
-              label="Vencimento"
+              label={t("invoices.form.fields.dueDate")}
               htmlFor="invoice-due-date"
               required
               error={form.formState.errors.due_date?.message}
@@ -272,7 +279,7 @@ export function InvoiceFormDialog({ open, onOpenChange, invoice }: InvoiceFormDi
           </div>
 
           <FormField
-            label="Status"
+            label={t("invoices.form.fields.status")}
             required
             error={form.formState.errors.status?.message}
           >
@@ -287,7 +294,7 @@ export function InvoiceFormDialog({ open, onOpenChange, invoice }: InvoiceFormDi
                   <SelectContent>
                     {INVOICE_STATUSES.map((s) => (
                       <SelectItem key={s.value} value={s.value}>
-                        {s.label}
+                        {t(s.labelKey)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -297,7 +304,7 @@ export function InvoiceFormDialog({ open, onOpenChange, invoice }: InvoiceFormDi
           </FormField>
 
           <FormField
-            label="ID externo"
+            label={t("invoices.form.fields.externalId")}
             htmlFor="invoice-external-id"
             error={form.formState.errors.external_id?.message}
           >
@@ -316,10 +323,10 @@ export function InvoiceFormDialog({ open, onOpenChange, invoice }: InvoiceFormDi
               onClick={() => onOpenChange(false)}
               disabled={isSubmitting}
             >
-              Cancelar
+              {t("common.cancel")}
             </Button>
             <Button type="submit" disabled={isSubmitting || customers.length === 0}>
-              {isSubmitting ? "Salvando…" : isEditing ? "Salvar alterações" : "Criar fatura"}
+              {isSubmitting ? t("common.saving") : isEditing ? t("common.saveChanges") : t("invoices.form.createSubmit")}
             </Button>
           </DialogFooter>
         </form>

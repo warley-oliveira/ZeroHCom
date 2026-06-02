@@ -1,8 +1,10 @@
-import { useEffect } from "react"
+import { useEffect, useMemo } from "react"
+import { useTranslation } from "react-i18next"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { toast } from "sonner"
+import type { TFunction } from "i18next"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -19,18 +21,19 @@ import { useCreateCustomer, useUpdateCustomer } from "@/hooks/useCustomers"
 import { toApiError } from "@/lib/api-errors"
 import type { Customer } from "@/types/customer"
 
-const customerSchema = z.object({
-  name: z.string().trim().min(1, "Informe o nome do cliente"),
-  email: z
-    .string()
-    .trim()
-    .email("E-mail inválido")
-    .or(z.literal(""))
-    .optional(),
-  external_id: z.string().trim().optional(),
-})
+const makeCustomerSchema = (t: TFunction) =>
+  z.object({
+    name: z.string().trim().min(1, t("customers.validation.nameRequired")),
+    email: z
+      .string()
+      .trim()
+      .email(t("customers.validation.emailInvalid"))
+      .or(z.literal(""))
+      .optional(),
+    external_id: z.string().trim().optional(),
+  })
 
-type CustomerFormValues = z.infer<typeof customerSchema>
+type CustomerFormValues = z.infer<ReturnType<typeof makeCustomerSchema>>
 
 interface CustomerFormDialogProps {
   open: boolean
@@ -39,9 +42,12 @@ interface CustomerFormDialogProps {
 }
 
 export function CustomerFormDialog({ open, onOpenChange, customer }: CustomerFormDialogProps) {
+  const { t } = useTranslation()
   const isEditing = Boolean(customer)
   const createMutation = useCreateCustomer()
   const updateMutation = useUpdateCustomer()
+
+  const customerSchema = useMemo(() => makeCustomerSchema(t), [t])
 
   const form = useForm<CustomerFormValues>({
     resolver: zodResolver(customerSchema),
@@ -72,14 +78,14 @@ export function CustomerFormDialog({ open, onOpenChange, customer }: CustomerFor
     try {
       if (customer) {
         await updateMutation.mutateAsync({ id: customer.id, payload })
-        toast.success("Cliente atualizado")
+        toast.success(t("customers.toasts.updated"))
       } else {
         await createMutation.mutateAsync(payload)
-        toast.success("Cliente criado")
+        toast.success(t("customers.toasts.created"))
       }
       onOpenChange(false)
     } catch (err) {
-      const apiError = toApiError(err, "Não foi possível salvar o cliente")
+      const apiError = toApiError(err, t("customers.toasts.saveError"))
       if (apiError.fieldErrors) {
         Object.entries(apiError.fieldErrors).forEach(([field, messages]) => {
           form.setError(field as keyof CustomerFormValues, {
@@ -98,17 +104,17 @@ export function CustomerFormDialog({ open, onOpenChange, customer }: CustomerFor
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{isEditing ? "Editar cliente" : "Novo cliente"}</DialogTitle>
+          <DialogTitle>{isEditing ? t("customers.form.editTitle") : t("customers.form.createTitle")}</DialogTitle>
           <DialogDescription>
             {isEditing
-              ? "Atualize as informações do cliente."
-              : "Cadastre um novo cliente para faturar."}
+              ? t("customers.form.editDescription")
+              : t("customers.form.createDescription")}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={onSubmit} className="space-y-4">
           <FormField
-            label="Nome"
+            label={t("customers.form.fields.name")}
             htmlFor="customer-name"
             required
             error={form.formState.errors.name?.message}
@@ -122,7 +128,7 @@ export function CustomerFormDialog({ open, onOpenChange, customer }: CustomerFor
           </FormField>
 
           <FormField
-            label="E-mail"
+            label={t("customers.form.fields.email")}
             htmlFor="customer-email"
             error={form.formState.errors.email?.message}
           >
@@ -136,7 +142,7 @@ export function CustomerFormDialog({ open, onOpenChange, customer }: CustomerFor
           </FormField>
 
           <FormField
-            label="ID externo"
+            label={t("customers.form.fields.externalId")}
             htmlFor="customer-external-id"
             error={form.formState.errors.external_id?.message}
           >
@@ -155,10 +161,10 @@ export function CustomerFormDialog({ open, onOpenChange, customer }: CustomerFor
               onClick={() => onOpenChange(false)}
               disabled={isSubmitting}
             >
-              Cancelar
+              {t("common.cancel")}
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Salvando…" : isEditing ? "Salvar alterações" : "Criar cliente"}
+              {isSubmitting ? t("common.saving") : isEditing ? t("common.saveChanges") : t("customers.form.submitCreate")}
             </Button>
           </DialogFooter>
         </form>

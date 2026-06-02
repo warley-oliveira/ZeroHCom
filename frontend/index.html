@@ -1,13 +1,31 @@
 <!doctype html>
-<html lang="pt-BR" class="dark">
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="color-scheme" content="dark" />
-    <style>
-      html { background-color: oklch(0.145 0 0); color: oklch(0.985 0 0); }
-    </style>
+    <!-- Apply the persisted/system theme before first paint to avoid a flash of the
+         wrong palette. Mirrors ThemeContext (key "zhc.theme", dark default). -->
+    <script>
+      ;(function () {
+        try {
+          var stored = localStorage.getItem("zhc.theme")
+          var theme =
+            stored === "light" || stored === "dark"
+              ? stored
+              : window.matchMedia("(prefers-color-scheme: light)").matches
+                ? "light"
+                : "dark"
+          var root = document.documentElement
+          root.classList.toggle("dark", theme === "dark")
+          root.style.colorScheme = theme
+          root.style.backgroundColor = theme === "dark" ? "oklch(0.145 0 0)" : "oklch(1 0 0)"
+          root.style.color = theme === "dark" ? "oklch(0.985 0 0)" : "oklch(0.145 0 0)"
+        } catch (e) {
+          document.documentElement.classList.add("dark")
+        }
+      })()
+    </script>
     <title>ZeroHCom</title>
   </head>
   <body>

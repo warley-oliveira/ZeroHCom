@@ -35,6 +35,23 @@ services:
       timeout: 5s
       retries: 10
 
+  redis:
+    image: redis:7-alpine
+    container_name: zerohcom_redis
+    restart: unless-stopped
+    # Host port 26379 follows the custom non-standard port convention
+    # (Postgres 25432, Mongo 27027) to avoid clashing with other projects.
+    ports:
+      - "26379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
 volumes:
   postgres_data:
   mongo_data:
+  redis_data:

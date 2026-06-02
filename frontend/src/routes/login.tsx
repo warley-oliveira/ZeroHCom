@@ -1,6 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { useState, type FormEvent } from "react"
+import { useTranslation } from "react-i18next"
 
+import { ClearLedgerLogo } from "@/components/ClearLedgerLogo"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -20,6 +22,7 @@ export const Route = createFileRoute("/login")({
 function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -34,7 +37,7 @@ function LoginPage() {
       await login(email, password)
       navigate({ to: "/dashboard" })
     } catch (err) {
-      setError("Credenciais inválidas. Verifique e tente novamente.")
+      setError(t("login.invalidCredentials"))
       console.error(err)
     } finally {
       setSubmitting(false)
@@ -42,16 +45,17 @@ function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
+    <div className="flex min-h-screen flex-col items-center justify-center gap-8 bg-muted/40 p-4">
+      <ClearLedgerLogo className="max-w-[280px]" />
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle>Entrar no ZeroHCom</CardTitle>
-          <CardDescription>Use seu e-mail e senha corporativos.</CardDescription>
+          <CardTitle>{t("login.title")}</CardTitle>
+          <CardDescription>{t("login.subtitle")}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">E-mail</Label>
+              <Label htmlFor="email">{t("login.email")}</Label>
               <Input
                 id="email"
                 type="email"
@@ -62,7 +66,7 @@ function LoginPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Senha</Label>
+              <Label htmlFor="password">{t("login.password")}</Label>
               <Input
                 id="password"
                 type="password"
@@ -80,7 +84,7 @@ function LoginPage() {
             ) : null}
 
             <Button type="submit" className="w-full" disabled={submitting}>
-              {submitting ? "Entrando..." : "Entrar"}
+              {submitting ? t("login.submitting") : t("login.submit")}
             </Button>
           </form>
         </CardContent>

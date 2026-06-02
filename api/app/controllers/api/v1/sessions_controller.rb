@@ -3,7 +3,7 @@ module Api
     class SessionsController < ApplicationController
       # Login é público — não inclui Authenticatable.
       def create
-        user = User.where('lower(email) = ?', params[:email].to_s.downcase.strip).first
+        user = User.where("lower(email) = ?", params[:email].to_s.downcase.strip).first
 
         if user&.authenticate(params[:password])
           token = JwtService.encode({ sub: user.id, org: user.organization_id })
@@ -17,7 +17,7 @@ module Api
             }
           }, status: :ok
         else
-          render json: { error: 'invalid_credentials' }, status: :unauthorized
+          render json: { error: "invalid_credentials" }, status: :unauthorized
         end
       end
 
